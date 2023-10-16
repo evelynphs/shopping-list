@@ -1,30 +1,60 @@
 {% extends 'base.html' %}
 
 {% block content %}
-    <nav class="navbar" style="background-color: #204299;">
+<nav class="navbar" style="background-color: #204299;">
         <div class="container-fluid">
-        <a class="navbar-brand text-white" href="#">Shopping List</a>
-        <form class="d-flex" role="search">
-            <a class="navbar-brand text-white" href="#">User: {{ name }}</a>
-            <a href="{% url 'main:logout' %}">
-                <button> Logout </button>
-            </a>
+            <a class="navbar-brand text-white" href="#">Shopping List</a>
+            <form class="d-flex" role="search">
+                <a class="navbar-brand text-white" href="#">User: {{ name }}</a>
+                <a href="{% url 'main:logout' %}"><button> Logout </button></a>
         </form>
         </div>
     </nav>
-
+    
     {% comment %} <h1>Shopping List Page</h1> {% endcomment %}
-
+    
     {% comment %}<h5>Logged-in user: </h5>{% endcomment %}
     {% comment %}<p>{{ name }}</p>{% endcomment %}
     
     <h5>Class: </h5>
     <p>{{ class }}</p>
-
+    
     <table id="product_table"></table>
-
+    
     <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">Add Product by AJAX</button>
     
+    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="exampleModalLabel">Add New Product</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="form" onsubmit="return false;">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="name" class="col-form-label">Name:</label>
+                            <input type="text" class="form-control" id="name" name="name"></input>
+                        </div>
+                        <div class="mb-3">
+                            <label for="price" class="col-form-label">Price:</label>
+                            <input type="number" class="form-control" id="price" name="price"></input>
+                        </div>
+                        <div class="mb-3">
+                            <label for="description" class="col-form-label">Description:</label>
+                            <textarea class="form-control" id="description" name="description"></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="button_add" data-bs-dismiss="modal">Add Product</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <h5>Sesi terakhir login: {{ last_login }}</h5>
     
     <a href="{% url 'main:create_product' %}">
@@ -57,7 +87,9 @@
                     <td>${item.fields.price}</td>
                     <td>${item.fields.description}</td>
                     <td>${item.fields.date_added}</td>
-                    </tr>` 
+                    <td><button onclick="editProduct(${item.pk})">Edit</button></a></td>
+                    <td><button onclick="deleteProduct(${item.pk})">Delete</button></a></td>
+                    </tr>`
                 })
                 
                 document.getElementById("product_table").innerHTML = htmlString
@@ -75,37 +107,14 @@
         return false
     }
     document.getElementById("button_add").onclick = addProduct
+
+    function editProduct(id){
+        window.location.href = `{% url 'main:edit_product' '123' %}`.replace('123', id);
+    }
+
+    function deleteProduct(id){
+        window.location.href = `{% url 'main:delete_product' '123' %}`.replace('123', id);
+    }
 </script>
 
-<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h1 class="modal-title fs-5" id="exampleModalLabel">Add New Product</h1>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <form id="form" onsubmit="return false;">
-                    {% csrf_token %}
-                    <div class="mb-3">
-                        <label for="name" class="col-form-label">Name:</label>
-                        <input type="text" class="form-control" id="name" name="name"></input>
-                    </div>
-                    <div class="mb-3">
-                        <label for="price" class="col-form-label">Price:</label>
-                        <input type="number" class="form-control" id="price" name="price"></input>
-                    </div>
-                    <div class="mb-3">
-                        <label for="description" class="col-form-label">Description:</label>
-                        <textarea class="form-control" id="description" name="description"></textarea>
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary" id="button_add" data-bs-dismiss="modal">Add Product</button>
-            </div>
-        </div>
-    </div>
-</div>
 {% endblock content %}
